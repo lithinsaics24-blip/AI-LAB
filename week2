@@ -1,0 +1,50 @@
+def get_neighbors(state):
+    neighbors = []
+    blank = state.index(0)
+    r, c = blank // 3, blank % 3
+    moves = []
+    if r > 0: moves.append(-3) # Up
+    if r < 2: moves.append(3)  # Down
+    if c > 0: moves.append(-1) # Left
+    if c < 2: moves.append(1)  # Right
+
+    for m in moves:
+        new_blank = blank + m
+        temp = list(state)
+        temp[blank], temp[new_blank] = temp[new_blank], temp[blank]
+        neighbors.append(tuple(temp))
+    return neighbors
+
+def dls(start, goal, path, limit):
+    if start == goal:
+        return path
+    if limit <= 0:
+        return None
+    for neighbor in get_neighbors(start):
+        if neighbor not in path:
+            result = dls(neighbor, goal, path + [neighbor], limit - 1)
+            if result:
+                return result
+    return None
+
+def iddfs(start, goal, max_depth=50):
+    for depth in range(max_depth + 1):
+        result = dls(start, goal, [start], depth)
+        if result:
+            print(f"Solution found at depth limit: {depth}")
+            return result
+    return None
+
+start_state = (1, 2, 3, 4, 0, 5, 7, 8, 6)
+goal_state = (1, 2, 3, 4, 5, 6, 7, 8, 0)
+
+solution = iddfs(start_state, goal_state, max_depth=20)
+
+if solution:
+    print(f"Solved using IDDFS in {len(solution) - 1} steps:")
+    for step in solution:
+        for i in range(0, 9, 3):
+            print(step[i:i+3])
+        print("-----")
+else:
+    print("No solution found within depth limit.")
